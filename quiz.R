@@ -150,8 +150,9 @@ subject.train <- read.table("./data/UCI HAR Dataset/train/subject_train.txt")
 features <- read.table("./data/UCI HAR Dataset/features.txt")
 names(xtrain) <- features[,2]
 activity.label <- read.table("./data/UCI HAR Dataset/activity_labels.txt")
-mgsub(activity.label[,1],activity.label[,2],ytrain[,1])
+ytrain[,1] <- mgsub(activity.label[,1],activity.label[,2],ytrain[,1])
 
+table(ytrain)
 
 
 ##### 
