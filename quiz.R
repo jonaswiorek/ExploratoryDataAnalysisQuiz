@@ -140,6 +140,22 @@ plot(1:10, svd4$v[,1], pch = 19)
 
 #############################
 #Video Lessons Week 4
+
+##### Clustering Case Study
+require(qdap) || install.packages("qdap")
+library(qdap) # Includes mgsub
+xtrain <- read.table("./data/UCI HAR Dataset/train/X_train.txt")
+ytrain <- read.table("./data/UCI HAR Dataset/train/y_train.txt")
+subject.train <- read.table("./data/UCI HAR Dataset/train/subject_train.txt")
+features <- read.table("./data/UCI HAR Dataset/features.txt")
+names(xtrain) <- features[,2]
+activity.label <- read.table("./data/UCI HAR Dataset/activity_labels.txt")
+mgsub(activity.label[,1],activity.label[,2],ytrain[,1])
+
+
+
+##### 
+
 pm99 <- read.table("./data/RD_501_88101_1999-0.txt",header = FALSE, sep = "|",
                    na.strings ="",comment.char = "#")
 pm12 <- read.table("./data/RD_501_88101_2012-0.txt",header = FALSE, sep = "|",
