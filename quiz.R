@@ -142,8 +142,10 @@ plot(1:10, svd4$v[,1], pch = 19)
 #Video Lessons Week 4
 
 ##### Clustering Case Study
-require(qdap) || install.packages("qdap")
+install.packages("qdap")
 library(qdap) # Includes mgsub
+require(dplyr) || install.packages("dplyr")
+library(dplyr)
 xtrain <- read.table("./data/UCI HAR Dataset/train/X_train.txt")
 ytrain <- read.table("./data/UCI HAR Dataset/train/y_train.txt")
 subject.train <- read.table("./data/UCI HAR Dataset/train/subject_train.txt")
@@ -152,9 +154,66 @@ names(xtrain) <- features[,2]
 activity.label <- read.table("./data/UCI HAR Dataset/activity_labels.txt")
 ytrain[,1] <- mgsub(activity.label[,1],activity.label[,2],ytrain[,1])
 
+SamsungData <- cbind(ytrain,subject.train,xtrain)
+names(SamsungData)[1:2] <- c("activity","subject") 
+SamsungData <- transform(SamsungData, activity = factor(activity))
+
 table(ytrain)
 
+par(mfrow = c(1,2), mar = c(5,4,1,1))
+sub1 <- filter(SamsungData, subject == 1)
+plot(sub1[,3], col=sub1$activity, ylab=names(sub1[3]))
+plot(sub1[,4], col=sub1$activity, ylab=names(sub1[4]))
+legend("bottomright", legend=unique(sub1$activity), 
+       col= unique(sub1$activity), pch = 1, cex = 0.5)
 
+
+source("myplclust.R")
+par(mfrow = c(1,1))
+distanceMatrix <- dist(sub1[,c(3:5)])
+hclustering <- hclust(distanceMatrix)
+myplclust(hclustering, lab.col = unclass(sub1$activity), cex = 0.5)
+
+par(mfrow = c(1,2), mar = c(5,4,1,1))
+plot(sub1[,12], col=sub1$activity, ylab=names(sub1[3]))
+plot(sub1[,13], col=sub1$activity, ylab=names(sub1[4]))
+legend("bottomright", legend=unique(sub1$activity), 
+       col= unique(sub1$activity), pch = 1, cex = 0.5)
+
+par(mfrow = c(1,1))
+distanceMatrix <- dist(sub1[,c(12:14)])
+hclustering <- hclust(distanceMatrix)
+myplclust(hclustering, lab.col = unclass(sub1$activity))
+myplclust(hclustering, cex = 0.5)
+
+svd1 <- svd(scale(sub1[,-c(1:2)]))
+par(mfrow = c(1,2))
+plot(svd1$u[,1], col = sub1$activity,pch= 19)
+plot(svd1$u[,2], col = sub1$activity,pch= 19)
+
+par(mfrow = c(1,1))
+plot(svd1$v[,2],pch= 19)
+
+par(mfrow = c(1,1))
+maxContrib <- which.max(svd1$v[,2])
+distanceMatrix <- dist(sub1[,c(12:14, maxContrib+2)])
+hclustering <- hclust(distanceMatrix)
+myplclust(hclustering, lab.col = unclass(sub1$activity))
+
+names(sub1[maxContrib+2])
+
+kClust <- kmeans(sub1[,-c(1:2)], centers=6)
+table(kClust$cluster, sub1$activity)
+kClust <- kmeans(sub1[,-c(1:2)], centers=6, nstart =1)
+table(kClust$cluster, sub1$activity)
+kClust <- kmeans(sub1[,-c(1:2)], centers=6, nstart =100)
+table(kClust$cluster, sub1$activity)
+kClust <- kmeans(sub1[,-c(1:2)], centers=6, nstart =100)
+table(kClust$cluster, sub1$activity)
+
+plot(kClust$centers[2,1:10], pch=19) #LAYING
+plot(kClust$centers[3,1:10], pch=19) #WALKING DOWNSTAIRS
+plot(kClust$centers[4,1:10], pch=19) #WALKING
 ##### 
 
 pm99 <- read.table("./data/RD_501_88101_1999-0.txt",header = FALSE, sep = "|",
